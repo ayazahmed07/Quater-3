@@ -13,9 +13,9 @@ while guess_counter < chances:
     my_guess = int(input("Enter your guess number: "))
 
     if my_guess == random_number:
-        print("f(You guess the correct number {random_number})")
+        print(f"(You guess the correct number!! {random_number} in the {guess_counter} attempt)")
+        break
 
 
 
 
-print(random_number)
