@@ -23,4 +23,12 @@ for items in iftar_items:
 
 # Dictionary, list, tuple, set
 
+def items(*n):
+    sum = 0
+    for item in n:
+        sum += item
+    print(sum)
+
+items(1, 2, 3, 4, 5)
+
 
