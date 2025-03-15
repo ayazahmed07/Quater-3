@@ -15,7 +15,7 @@ while guess_counter < chances:
     if my_guess == random_number:
         print(f"(You guess the correct number!! {random_number} in the {guess_counter} attempt)")
         break
-    elif guess_counter >= and chances   
+
 
 
 
