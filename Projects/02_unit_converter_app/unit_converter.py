@@ -46,7 +46,7 @@ options = st.radio("Select conversion type:", ["Unit Conversion", "Currency Conv
 
 if options == "Currency Conversion":
     st.subheader("Currency Conversion")
-    amount = st.number_input("Enter the amount:", min_value=1.0, step=1.0) # create a number input for the amount
+    amount = st.number_input("Enter the amount:", min_value=1.0,) # create a number input for the amount
     currency_from = st.selectbox("Convert from:", ["USD", "EUR", "GBP", "INR", "PKR", "AED",]) # dropdown menu for the currency from
     currency_to = st.selectbox("Convert to:", ["USD", "EUR", "GBP", "INR", "PKR", "AED"]) # dropdown menu for the currency to
 
@@ -57,7 +57,7 @@ if options == "Currency Conversion":
 
 if options == "Unit Conversion":
     st.subheader("Unit Conversion")
-    value = st.number_input("Enter the value:", min_value=1.0,) # create a number input for the value
+    value = st.number_input("Enter the value:", min_value=1.0, step=1.0) # create a number input for the value
 
     unit_from = st.selectbox("Convert from:", ["Meters", "Kilometers", "Grams", "Kilograms", "Inches", "Centimeters",]) # dropdown menu for the unit from
 
