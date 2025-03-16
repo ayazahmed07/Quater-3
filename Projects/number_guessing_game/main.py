@@ -1,8 +1,10 @@
 import random
 
-chances: int = 3
+print(f"Welcome to the Number Guessing Game!!")
 
-print(f"Welcome to the Number Guessing Game!!\n You got {chances} attempts to guess the number between 1 and 10, lets start the game")
+chances: int = int(input("Enter your number of attempts: "))
+
+print(f"You got {chances} attempts to guess the number between 1 to 20")
 
 random_number = random.randrange(1, 10)
 
