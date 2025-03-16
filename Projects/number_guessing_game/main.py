@@ -1,10 +1,10 @@
 import random
 
-print("Welcome to the Number Guessing Game!! \n You got 5 attempts to guess the number between 1 and 30, lets start the game")
+chances: int = 3
 
-random_number = random.randrange(1, 30)
+print(f"Welcome to the Number Guessing Game!!\n You got {chances} attempts to guess the number between 1 and 10, lets start the game")
 
-chances: int = 5
+random_number = random.randrange(1, 10)
 
 guess_counter: int = 0;
 
@@ -13,8 +13,18 @@ while guess_counter < chances:
     my_guess = int(input("Enter your guess number: "))
 
     if my_guess == random_number:
-        print(f"(You guess the correct number!! {random_number} in the {guess_counter} attempt)")
+        print(f"(You guess the correct number!! Your number is {random_number} and you guess in the {guess_counter} attempt!!)")
         break
+    elif guess_counter >= chances and my_guess != random_number:
+        print(f"You failed to guess the number, the correct number is {random_number} better luck next time!!")
+
+    elif my_guess < random_number:
+        print("Your guess is too low try again!!")
+
+    elif my_guess > random_number:
+        print("Your guess is too high try again!!")
+
+
 
 
 
