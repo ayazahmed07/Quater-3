@@ -7,12 +7,12 @@ import requests  # requests is a library for making HTTP requests
 def convert_units(value, unit_from, unit_to):
 
     conversions = {
-        "meters_kilometers": 0.001, # 1 meter = 0.001 Kilometer
-        "kilometers_meters": 1000,  # 1 Kilometer = 1000 meter
-        "grams_kilograms": 0.001,  # 1 gram = 0.001 Kilogram
-        "kilograms_grams": 1000,   # 1 Kilogram = 1000 gram
-        "inches_centimeters": 2.54,
-        "centimeters_inches": 0.3937,
+        "Meters_Kilometers": 0.001, # 1 meter = 0.001 Kilometer
+        "Kilometers_Meters": 1000,  # 1 Kilometer = 1000 meter
+        "Grams_Kilograms": 0.001,  # 1 gram = 0.001 Kilogram
+        "Kilograms_Grams": 1000,   # 1 Kilogram = 1000 gram
+        "Inches_Centimeters": 2.54,
+        "Centimeters_Inches": 0.3937,
               
     }
 
