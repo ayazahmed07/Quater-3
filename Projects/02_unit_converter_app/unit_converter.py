@@ -13,17 +13,7 @@ def convert_units(value, unit_from, unit_to):
         "kilograms_grams": 1000,   # 1 Kilogram = 1000 gram
         "inches_centimeters": 2.54,
         "centimeters_inches": 0.3937,
-        "pounds_kilograms": 0.453592,
-        "kilograms_pounds": 2.20462,
-        "celsius_fahrenheit": lambda c: (c * 9/5) + 32,
-        "fahrenheit_celsius": lambda f: (f - 32) * 5/9,
-        "kmh_mph": 0.621371,
-        "mph_kmh": 1.60934,
-        "bytes_kb": 0.001,
-        "kb_mb": 0.001,
-        "mb_gb": 0.001,
-        "gb_tb": 0.001,
-        
+              
     }
 
     key = f"{unit_from}_{unit_to}" # Generate a unique key for the conversion based on the unit from and unit to
@@ -67,11 +57,11 @@ if options == "Currency Conversion":
 
 if options == "Unit Conversion":
     st.subheader("Unit Conversion")
-    value = st.number_input("Enter the value:", min_value=1.0, step=1.0) # create a number input for the value
+    value = st.number_input("Enter the value:", min_value=1.0,) # create a number input for the value
 
-    unit_from = st.selectbox("Convert from:", ["meters", "kilometers", "grams", "kilograms", "inches", "centimeters", "pounds", "celsius", "fahrenheit", "kmh", "mph"]) # dropdown menu for the unit from
+    unit_from = st.selectbox("Convert from:", ["Meters", "Kilometers", "Grams", "Kilograms", "Inches", "Centimeters",]) # dropdown menu for the unit from
 
-    unit_to = st.selectbox("Convert to:", ["meters", "kilometers", "grams", "kilograms", "inches", "centimeters", "pounds", "celsius", "fahrenheit", "kmh", "mph"]) # dropdown menu for the unit to
+    unit_to = st.selectbox("Convert to:", ["Meters", "Kilometers", "Grams", "Kilograms", "Inches", "Centimeters",]) # dropdown menu for the unit to
 
     if st.button("Convert Units"): # create a button to convert the value
         result = convert_units(value, unit_from, unit_to) # call the convert_units function
