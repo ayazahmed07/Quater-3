@@ -1,10 +1,18 @@
 import streamlit as st
+import random
+import string  #provide specific letters
 import pandas as pd
 
-st.title("PASSWORD STRENGTH")
+st.title("PASSWORD GENERATOR")
 
-st.sidebar.title("Sidebar")
-st.sidebar.write("This is a sidebar.")
-option = st.sidebar.radio("Select Option", ["Option1", "Option 2", "Option 3"])
+def password_generator(length, use_digits, use_special):
+    characters = string.ascii_letters
+    if use_digits:
+        characters += string.digits
+        
+    if use_special:
+        characters += string.punctuation
+    
+
 
 
