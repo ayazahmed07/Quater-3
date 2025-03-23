@@ -60,16 +60,16 @@ elif menu == "Add Book":
     title = st.text_input("Title")
     author = st.text_input("Author")
     year = st.number_input("Year", min_value=1990, max_value=2100, step=1)
-    genere = st.text_input("Genere")
+    genre = st.text_input("Genre")
     read_status = st.checkbox("Mark as Read")
 
-    if st.button("Add Your Books"):
+    if st.button("Add Book"):
 
         if any(book["title"].lower() == title.lower() for book in library):
             st.error("A Book with this title is already exists!!")
 
         else:
-            library.append({"title": title, "author": author, "year": year, "genere": genere, "read_status": read_status})
+            library.append({"title": title, "author": author, "year": year, "genere": genre, "read_status": read_status})
             save_library()
             st.success("Book Added Successfuly!")
             st.rerun()
@@ -107,6 +107,34 @@ elif menu == "Search Book":
 
     elif not search_term.strip():
         st.warning("Please enter a search term")
+
+
+# to updated / edit a book
+
+elif menu == "Edit/Update Book":
+    st.sidebar.title("Edit/Update Book")
+    book_titles = [book["title"] for book in library]
+
+    if book_titles:
+        selected_books = st.selectbox("Select a book to edit", ["Select a book"] + book_titles)
+
+        if selected_books != "Select a book":
+            book_to_edit = next((book for book in library if book["title"] == selected_books), None)
+
+            if book_to_edit:
+                new_title = st.text_input("Title", book_to_edit["title"])
+                new_author = st.text_input("Author", book_to_edit["author"])
+                new_year = st.number_input("Year", min_value=1900, max_value=2100, step=1, value=book_to_edit["year"])
+                new_genre = st.text_input("Genre", book_to_edit["genre"])
+                new_read_status = st.checkbox("Mark as Read", book_to_edit["read_status"])
+
+                if st.button("Update Book"):
+                    book_to_edit.update({"title": new_title, "author": new_author, "year": new_year, "genre": new_genre, "read_status": new_read_status})
+                    save_library()
+                    st.success(f"'{selected_books}' updated successfully!")
+                    st.rerun()
+    else:
+        st.warning("No books available to edit.")
 
 
 #save and exit
