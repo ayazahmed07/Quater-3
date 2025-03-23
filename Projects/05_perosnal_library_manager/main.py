@@ -1,6 +1,29 @@
 import streamlit as st
 import json
 
+# Custom CSS to make all text green
+custom_css = """
+<style>
+   
+    /* Buttons */
+    .stButton > button {
+        background-color: #ff5722 !important; /* Orange button */
+        color: #00FF00 !important; /* Green text */
+        border-radius: 8px;
+        border: none;
+    }
+
+    .stButton > button:hover {
+        background-color: #e64a19 !important; /* Darker orange */
+    }
+ 
+</style>
+"""
+
+# Inject CSS into Streamlit
+st.markdown(custom_css, unsafe_allow_html=True)
+
+
 # load and save the library data
 
 def load_library():
@@ -8,19 +31,23 @@ def load_library():
         with open("library.json", "r") as file:
             return json.load(file)
     except FileNotFoundError:
-        return[]
+        return []
     
 
 def save_library():
     with open("library.json", "w") as file:
         json.dump(library, file, indent=4)
 
-library = load_library
+library = load_library()
 
-st.title("Perosnal Library Manager")
-menu = st.sidebar.radio("Select an option", ["View Library", "Add Book", "Remove Book", "Search Book", "Save and Exit" ])
+st.title("📚 Perosnal Library Manager")
+
+menu = st.sidebar.radio("Select an option", ["View Library", "Add Book", "Remove Book", "Search Book", "Edit/Update Book", "Save and Exit" ])
+
 if menu == "View Library":
-    st.sidebar("Your Library")
+
+    st.sidebar.title("Your Library")
+
     if library:
         st.table(library)
     else:
@@ -29,48 +56,57 @@ if menu == "View Library":
 # add book
 
 elif menu == "Add Book":
-    st.sidebar("Add a new Book")
+    st.sidebar.title("Add a new Book")
     title = st.text_input("Title")
-    author = st.text_input("Authon")
-    year = st.number_input("Year", min_value=2022, max_value=2100, step=1)
+    author = st.text_input("Author")
+    year = st.number_input("Year", min_value=1990, max_value=2100, step=1)
     genere = st.text_input("Genere")
     read_status = st.checkbox("Mark as Read")
 
-    if st.button("Add Book"):
-        library.append({"title": title, "author": author, "year": year, "genere": genere, "read_status": read_status})
-        save_library()
-        st.success("Book Added Successfuly!")
-        st.rerun()
+    if st.button("Add Your Books"):
+
+        if any(book["title"].lower() == title.lower() for book in library):
+            st.error("A Book with this title is already exists!!")
+
+        else:
+            library.append({"title": title, "author": author, "year": year, "genere": genere, "read_status": read_status})
+            save_library()
+            st.success("Book Added Successfuly!")
+            st.rerun()
 
 # remove book
 
 elif menu == "Remove Book":
-    st.sidebar("Remove a book")
+    st.sidebar.title("Remove a book")
     book_titles = [book["title"] for book in library]
 
     if book_titles:
-        selected_book = st.selectbox("Select a book to remove", book_titles)
-        if st.button("Remove Book"):
-            library = [book for book in library if book["title"] != selected_book]
+        selected_books = [title for title in book_titles if st.checkbox(title)]
+
+        if st.button("Remove Selected Books") and selected_books:
+            library = [book for book in library if book["title"] not in selected_books]
             save_library()
-            st.success("Book removed successfuly!")
+            st.success("Selected Books removed successfuly!")
             st.rerun()
         else:
-            st.warning("No book in library. Add a book!")
+            st.warning("No books in the library to remove... Add a book!")
 
 
 #search book
 
 elif menu == "Search Book":
-    st.sidebar("Search a book")
+    st.sidebar.title("Search a book")
     search_term = st.text_input("Enter title or author name")
     
-    if st.button("Search"):
+    if st.button("Search") and search_term.strip():
         results = [book for book in library if search_term.lower() in book["title"].lower() or search_term.lower() in book["author"].lower()]
         if results:
             st.table(results)
         else:
             st.warning("No book found!")
+
+    elif not search_term.strip():
+        st.warning("Please enter a search term")
 
 
 #save and exit
