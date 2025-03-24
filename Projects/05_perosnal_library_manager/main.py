@@ -129,8 +129,9 @@ elif menu == "Edit/Update Book":
         if results:
             selected_book_title = st.selectbox("Select a book to edit", [book["title"] for book in results])
 
-            # Get the selected book object
-            book_to_edit = next((book for book in library if book["title"] == selected_book_title), None)
+            # Get the selected book's index and object
+            book_index = next((i for i, book in enumerate(library) if book["title"] == selected_book_title), None)
+            book_to_edit = library[book_index] if book_index is not None else None
 
             if book_to_edit:
                 new_title = st.text_input("Title", book_to_edit["title"])
@@ -144,18 +145,14 @@ elif menu == "Edit/Update Book":
                     if new_title.lower() != book_to_edit["title"].lower() and any(book["title"].lower() == new_title.lower() for book in library if book != book_to_edit):
                         st.error("A book with this title already exists! Choose a different title.")
                     else:
-                        # 🔥 First, remove the old book entry
-                        library = [book for book in library if book != book_to_edit]
-
-                        # 🔥 Then, add the updated book details
-                        updated_book = {
+                        # 🔥 Update book in place to keep the order unchanged
+                        library[book_index] = {
                             "title": new_title,
                             "author": new_author,
                             "year": new_year,
                             "genre": new_genre,
                             "read_status": new_read_status
                         }
-                        library.append(updated_book)
 
                         save_library()
                         st.session_state["success_message"] = f"'{selected_book_title}' updated successfully!"
