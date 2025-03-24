@@ -1,1 +1,37 @@
-[]
+[
+    {
+        "title": "Sales Tax",
+        "author": "GOP",
+        "year": 1990,
+        "genre": "Fiction",
+        "read_status": false
+    },
+    {
+        "title": "Income Tax",
+        "author": "GOP",
+        "year": 1990,
+        "genre": "Fiction",
+        "read_status": true
+    },
+    {
+        "title": "Income Tax 2",
+        "author": "GOP",
+        "year": 1990,
+        "genre": "Fiction",
+        "read_status": false
+    },
+    {
+        "title": "Parda",
+        "author": "Nachin ",
+        "year": 1990,
+        "genre": "dd",
+        "read_status": false
+    },
+    {
+        "title": "Not read",
+        "author": "hy",
+        "year": 1990,
+        "genre": "why",
+        "read_status": false
+    }
+]
