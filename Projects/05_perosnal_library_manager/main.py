@@ -44,18 +44,11 @@ st.title("Perosnal Library Manager")
 
 menu = st.sidebar.radio("Select an option", ["View Library", "Add Book", "Remove Book", "Search Book", "Edit/Update Book", "Save and Exit" ])
 
-if menu == "View Library":
 
-    st.sidebar.title("Your Library")
-
-    if library:
-        st.table(library)
-    else:
-        st.write("No Books in your library... Add books now!!")
 
 # add book
 
-elif menu == "Add Book":
+if menu == "Add Book":
     st.sidebar.title("Add a new Book")
     title = st.text_input("Title")
     author = st.text_input("Author")
@@ -73,6 +66,16 @@ elif menu == "Add Book":
             save_library()
             st.success("Book Added Successfuly!")
             st.rerun()
+
+elif menu == "View Library":
+
+    st.sidebar.title("Your Library")
+
+    if library:
+        st.table(library)
+    else:
+        st.error("No Books in your library... Add books now!!")
+
 
 # remove book
 
