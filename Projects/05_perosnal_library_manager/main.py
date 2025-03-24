@@ -69,7 +69,7 @@ elif menu == "Add Book":
             st.error("A Book with this title is already exists!!")
 
         else:
-            library.append({"title": title, "author": author, "year": year, "genere": genre, "read_status": read_status})
+            library.append({"title": title, "author": author, "year": year, "genre": genre, "read_status": read_status})
             save_library()
             st.success("Book Added Successfuly!")
             st.rerun()
