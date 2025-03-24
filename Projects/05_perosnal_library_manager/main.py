@@ -55,14 +55,12 @@ if menu == "Add Book":
     read_status = st.checkbox("Mark as Read")
 
     if st.button("Add Your Book"):
-        
         if not title.strip():
             st.error("Title is required!!")
         elif not author.strip():
             st.error("Author is required!")
         elif any(book["title"].lower() == title.lower() for book in library):
             st.error("A Book with this title is already exists!!")
-
         else:
             library.append({"title": title, "author": author, "year": year, "genre": genre, "read_status": read_status})
             save_library()
