@@ -78,18 +78,18 @@ elif menu == "Add Book":
 
 elif menu == "Remove Book":
     st.sidebar.title("Remove a book")
-    book_titles = [book["title"] for book in library]
+    
+    if library:
+        book_titles = [book["title"] for book in library]
+        selected_books = st.multiselect("Select books to remove", book_titles)
 
-    if book_titles:
-        selected_books = [title for title in book_titles if st.checkbox(title)]
-
-        if st.button("Remove Selected Books") and selected_books:
+        if st.button("Remove Selected Books"):
             library = [book for book in library if book["title"] not in selected_books]
             save_library()
             st.success("Selected Books removed successfuly!")
             st.rerun()
-        else:
-            st.warning("No books in the library to remove... Add a book!")
+    else:
+        st.warning("No books in the library to remove... Add a book!")
 
 
 #search book

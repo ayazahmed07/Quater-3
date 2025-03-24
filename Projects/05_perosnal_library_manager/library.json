@@ -1,16 +1,1 @@
-[
-    {
-        "title": "Java Script",
-        "author": "Ayaz",
-        "year": 2022,
-        "genre": "5th",
-        "read_status": true
-    },
-    {
-        "title": "Typescript",
-        "author": "Ramaza",
-        "year": 2016,
-        "genre": "6th",
-        "read_status": true
-    }
-]
+[]
