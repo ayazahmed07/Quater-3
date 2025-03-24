@@ -65,8 +65,12 @@ if menu == "Add Book":
             library.append({"title": title, "author": author, "year": year, "genre": genre, "read_status": read_status})
             save_library()
             st.success("Book Added Successfuly!")
-            st.session_state["book added"] = True
+            st.session_state["success_message"] = "Book Added Successfuly!"
             st.rerun()
+            
+if "success_message" in st.session_state:
+    st.success(st.session_state["success_message"])
+    del st.session_state["success_message"]  # Remove message after displaying
 
 elif menu == "View Library":
 
