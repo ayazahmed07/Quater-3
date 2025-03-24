@@ -143,7 +143,7 @@ elif menu == "Edit/Update Book":
 
     search_term = st.text_input("Enter book title or author name to search the book")
 
-    if search_term():
+    if search_term.strip():
         results = [book for book in library if search_term.lower() in book["title"].lower() or search_term.lower() in book["author"].lower()]
         if results:
             selected_book_title = st.selectbox("Select a book to edit", [book["title"] for book in results])
