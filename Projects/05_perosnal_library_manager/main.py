@@ -121,30 +121,54 @@ elif menu == "Search Book":
         
 elif menu == "Edit/Update Book":
     st.sidebar.title("Edit/Update a Book")
-    book_titles = [book["title"] for book in library]
 
-    if book_titles:
-        selected_book = st.selectbox("Select a book to edit", ["Select a book"] + book_titles)
+    search_term = st.text_input("Enter book title or author name to search the book")
 
-        if selected_book != "Select a book":
-            book_to_edit = next((book for book in library if book["title"] == selected_book), None)
+    if search_term.strip():
+        results = [book for book in library if search_term.lower() in book["title"].lower() or search_term.lower() in book["author"].lower()]
+        if results:
+            selected_book_title = st.selectbox("Select a book to edit", [book["title"] for book in results])
+
+            # Get the selected book object
+            book_to_edit = next((book for book in library if book["title"] == selected_book_title), None)
 
             if book_to_edit:
                 new_title = st.text_input("Title", book_to_edit["title"])
                 new_author = st.text_input("Author", book_to_edit["author"])
                 new_year = st.number_input("Year", min_value=1900, max_value=2100, step=1, value=book_to_edit["year"])
-                new_genre = st.text_input("Genre", book_to_edit["genre"])  # ✅ Fixed key
+                new_genre = st.text_input("Genre", book_to_edit["genre"])
                 new_read_status = st.checkbox("Mark as Read", book_to_edit["read_status"])
 
                 if st.button("Update Book"):
-                    book_to_edit.update({"title": new_title, "author": new_author, "year": new_year, "genre": new_genre, "read_status": new_read_status})
-                    save_library()
-                    st.success(f"'{selected_book}' updated successfully!")  # ✅ Message now displays
-                    st.rerun()
-    else:
-        st.warning("No books available to edit.")
+                    # 🔹 Check if the new title already exists in another book (excluding the one being edited)
+                    if new_title.lower() != book_to_edit["title"].lower() and any(book["title"].lower() == new_title.lower() for book in library if book != book_to_edit):
+                        st.error("A book with this title already exists! Choose a different title.")
+                    else:
+                        # 🔥 First, remove the old book entry
+                        library = [book for book in library if book != book_to_edit]
 
+                        # 🔥 Then, add the updated book details
+                        updated_book = {
+                            "title": new_title,
+                            "author": new_author,
+                            "year": new_year,
+                            "genre": new_genre,
+                            "read_status": new_read_status
+                        }
+                        library.append(updated_book)
 
+                        save_library()
+                        st.session_state["success_message"] = f"'{selected_book_title}' updated successfully!"
+                        st.rerun()
+
+        else:
+            st.warning("No matching book found!")
+
+    # Display success message
+    if "success_message" in st.session_state:
+        st.success(st.session_state["success_message"])
+        del st.session_state["success_message"]
+        
 #save and exit
 
 elif menu == "Save and Exit":

@@ -1,51 +1,30 @@
 [
     {
-        "title": "Rahi",
-        "author": "chawla",
-        "year": 1990,
-        "genre": "7th",
-        "read_status": true
-    },
-    {
-        "title": "Book1",
-        "author": "ayaz",
-        "year": 2017,
-        "genre": "9th",
-        "read_status": false
-    },
-    {
-        "title": "Ayaz",
-        "author": "Ayaz",
-        "year": 1990,
-        "genre": "11",
-        "read_status": false
-    },
-    {
-        "title": "",
-        "author": "",
-        "year": 1990,
-        "genre": "",
-        "read_status": false
-    },
-    {
-        "title": "Ayaz11",
-        "author": "zahid",
-        "year": 1990,
+        "title": "book2",
+        "author": "raj",
+        "year": 2015,
         "genre": "th",
         "read_status": true
     },
     {
-        "title": "Ayaz111",
-        "author": "zahid",
-        "year": 1990,
+        "title": "book2",
+        "author": "raj",
+        "year": 2015,
         "genre": "th",
         "read_status": true
     },
     {
-        "title": "Ayaz111dfdf",
-        "author": "zahid",
+        "title": "book31",
+        "author": "dfdf",
         "year": 1990,
-        "genre": "th",
+        "genre": "dfdf",
         "read_status": true
+    },
+    {
+        "title": "grok",
+        "author": "afdf",
+        "year": 1990,
+        "genre": "dfd",
+        "read_status": false
     }
 ]
