@@ -40,9 +40,9 @@ def save_library():
 
 library = load_library()
 
-st.title("Perosnal Library Manager")
+st.title("Welcome to your Perosnal Library Manager")
 
-menu = st.sidebar.radio("Select an option", ["Add Book", "View Library", "Remove Book", "Search Book", "Edit/Update Book", "Save and Exit" ])
+menu = st.sidebar.radio("Select an option", ["Add Book", "View Library", "Remove Book", "Search Book", "View Statistics", "Edit/Update Book", "Save and Exit" ])
 
 # add book
 
@@ -116,6 +116,26 @@ elif menu == "Search Book":
     elif not search_term.strip():
         st.warning("Please enter a search term")
         
+        
+# view stats
+        
+elif menu == "View Statistics":
+    st.sidebar.title("View Statistics")
+    
+    if library:
+        st.table(library)
+        
+        total_books = len(library)
+        read_books = sum(1 for book in library if book ["read status"])
+        read_percentage = (read_books / total_books) * 100 if total_books > 0 else 0
+        
+        st.markdown("### 📊 Library Statistics")
+        st.write(f"📚 **Total Books:** {total_books}")
+        st.write(f"✅ **Books Read:** {read_books} ({read_percentage:.2f}%)")
+    
+    else:
+        st.error("No Books in your library... Add books now!!")
+
 
 #Edit/Update
         
