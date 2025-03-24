@@ -42,9 +42,7 @@ library = load_library()
 
 st.title("Perosnal Library Manager")
 
-menu = st.sidebar.radio("Select an option", ["View Library", "Add Book", "Remove Book", "Search Book", "Edit/Update Book", "Save and Exit" ])
-
-
+menu = st.sidebar.radio("Select an option", ["Add Book", "View Library", "Remove Book", "Search Book", "Edit/Update Book", "Save and Exit" ])
 
 # add book
 
@@ -56,7 +54,7 @@ if menu == "Add Book":
     genre = st.text_input("Genre")
     read_status = st.checkbox("Mark as Read")
 
-    if st.button("Add Your Books"):
+    if st.button("Add Your Book"):
 
         if any(book["title"].lower() == title.lower() for book in library):
             st.error("A Book with this title is already exists!!")

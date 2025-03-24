@@ -1,1 +1,16 @@
-[]
+[
+    {
+        "title": "Rahi",
+        "author": "chawla",
+        "year": 1990,
+        "genre": "7th",
+        "read_status": true
+    },
+    {
+        "title": "Johi",
+        "author": "chawal",
+        "year": 1990,
+        "genre": "8th",
+        "read_status": true
+    }
+]
