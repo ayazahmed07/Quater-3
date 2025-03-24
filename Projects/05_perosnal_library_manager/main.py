@@ -123,8 +123,7 @@ elif menu == "View Statistics":
     st.sidebar.title("View Statistics")
     
     if library:
-        st.table(library)
-        
+             
         total_books = len(library)
         read_books = sum(1 for book in library if book ["read_status"])
         read_percentage = (read_books / total_books) * 100 if total_books > 0 else 0
