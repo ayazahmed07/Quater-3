@@ -66,7 +66,7 @@ if menu == "Add Book":
             save_library()
             st.success("Book Added Successfuly!")
             st.session_state["book added"] = True
-            st.experimental_rerun()
+            st.rerun()
 
 elif menu == "View Library":
 

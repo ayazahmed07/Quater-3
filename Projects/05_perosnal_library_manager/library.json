@@ -26,5 +26,12 @@
         "year": 1990,
         "genre": "",
         "read_status": false
+    },
+    {
+        "title": "Ayaz11",
+        "author": "zahid",
+        "year": 1990,
+        "genre": "th",
+        "read_status": true
     }
 ]
