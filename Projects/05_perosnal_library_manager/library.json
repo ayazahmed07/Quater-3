@@ -1,1 +1,9 @@
-[]
+[
+    {
+        "title": "Java Script",
+        "author": "Ayaz",
+        "year": 2022,
+        "genre": "5th",
+        "read_status": true
+    }
+]
