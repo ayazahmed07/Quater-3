@@ -1,1 +1,16 @@
-[]
+[
+    {
+        "title": "The Russian",
+        "author": "None",
+        "year": 2020,
+        "genre": "fiction",
+        "read_status": true
+    },
+    {
+        "title": "Just as I Am",
+        "author": "NA",
+        "year": 2021,
+        "genre": "non-fiction",
+        "read_status": false
+    }
+]
