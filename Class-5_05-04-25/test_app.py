@@ -14,4 +14,3 @@ if __name__ == "__main__":
 # # we use return to terminate the state
 # my.py
 # py.test
-# to use test cases we wrtie assert
