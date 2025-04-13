@@ -1,6 +1,9 @@
-def main():
-    print("Hello from 07-secure-data-encryption-system-using-streamlit!")
+import streamlit as st
 
+import json
+import hashlib
 
-if __name__ == "__main__":
-    main()
+st.title("Secure Data Encryption System")
+
+menu = ["Home Page", "Store Data", "Retrieve Data", "Login"]
+choice = st.sidebar._selectbox("Navigation", menu)
