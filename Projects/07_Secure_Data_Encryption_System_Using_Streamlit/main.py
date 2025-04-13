@@ -3,6 +3,10 @@ from cryptography.fernet import Fernet
 import json
 import hashlib
 
+Furnet = Fernet.generate_key()
+
+def passkey
+
 
 # Streamlit UI
 
@@ -12,7 +16,7 @@ st.title("Secure Data Encryption System")
 menu = ["Home", "Store Data", "Retrieve Data", "Login"]
 choice = st.sidebar.selectbox("Navigation", menu)
 
-if choice == "Home":
+if choice == "Home":    
     st.subheader("🏠 Welcome to the Secure Data System")
     st.write("Use this app to **securely store and retrieve data** using unique passkeys.")
 
