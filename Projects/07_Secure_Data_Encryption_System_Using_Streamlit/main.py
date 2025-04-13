@@ -3,9 +3,31 @@ from cryptography.fernet import Fernet
 import json
 import hashlib
 
-Furnet = Fernet.generate_key()
+Key = Fernet.generate_key()
+cipher = Fernet(Key)
 
-def passkey
+stored_data = {}
+failed_attempts = 0
+
+def hash_passkey(passkey):
+    return hashlib.sha256(passkey.encode()).hexdigest()
+
+# Function to encrypt data
+def encrypt_data(text, passkey):
+    return cipher.encrypt(text.encode()).decode()
+
+# Function to decrypt data
+def decrypt_data(encrypted_text, passkey):
+    global failed_attempts
+    hashed_passkey = hash_passkey(passkey)
+
+    for key, value in stored_data.items():
+        if value["encrypted_text"] == encrypted_text and value["passkey"] == hashed_passkey:
+            failed_attempts = 0
+            return cipher.decrypt(encrypted_text.encode()).decode()
+    
+    failed_attempts += 1
+    return None
 
 
 # Streamlit UI
@@ -28,7 +50,7 @@ elif choice == "Store Data":
     if st.button("Encrypt & Save"):
         if user_data and passkey:
             hashed_passkey = hash_passkey(passkey)
-            encrypted_data = encrypt_data(data)
+            encrypted_data = encrypt_data(user_data, passkey)
             st.success("Data Stored Successfuly!")
         else:
             st.error("Please enter both data and passkey")
