@@ -17,8 +17,8 @@ def init_db():
                   account_title TEXT, 
                   bank_name TEXT, 
                   branch_name TEXT, 
-                  address TEXT, 
-                  manager_name TEXT)''')
+                  address TEXT,''')
+                  
     conn.commit()
     conn.close()
 
@@ -251,4 +251,4 @@ def main():
                     st.success("PDF generated successfully!")
 
 if __name__ == "__main__":
-    main()
+    main() 
