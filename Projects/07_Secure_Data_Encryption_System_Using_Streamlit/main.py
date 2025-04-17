@@ -55,4 +55,35 @@ elif choice == "Store Data":
         else:
             st.error("Please enter both data and passkey")
 
-    
+elif choice == "Retrieve Data":
+    st.subheader("Retrieve Data")
+    encrypted_text = st.text_area("Enter Encrypted Data:")
+    passkey = st.text_input("Enter Passkey:", type="password")
+
+    if st.button("Decrypt"):
+        if encrypted_text and passkey:
+            decrypted_text = decrypt_data(encrypted_text, passkey)
+
+            if decrypted_text:
+                st.success(f"✅ Decrypted Data: {decrypted_text}")
+            else:
+                st.error(f"❌ Incorrect passkey! Attempts remaining: {3 - failed_attempts}")
+
+                if failed_attempts >= 3:
+                    st.warning("🔒 Too many failed attempts! Redirecting to Login Page.")
+                    st.experimental_rerun()
+        else:
+            st.error("⚠️ Both fields are required!")
+
+elif choice == "Login":
+    st.subheader("🔑 Reauthorization Required")
+    login_pass = st.text_input("Enter Master Password:", type="password")
+
+    if st.button("Login"):
+        if login_pass == "admin123":  # Hardcoded for demo, replace with proper auth
+            global failed_attempts
+            failed_attempts = 0
+            st.success("✅ Reauthorized successfully! Redirecting to Retrieve Data...")
+            st.experimental_rerun()
+        else:
+            st.error("❌ Incorrect password!")
