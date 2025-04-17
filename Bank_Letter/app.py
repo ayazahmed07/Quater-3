@@ -23,23 +23,23 @@ def init_db():
     conn.close()
 
 # Add a new bank account
-def add_account(account_number, account_title, bank_name, branch_name, address, manager_name):
+def add_account(account_number, account_title, bank_name, branch_name, address):
     conn = sqlite3.connect('bank_accounts.db')
     c = conn.cursor()
-    c.execute('''INSERT INTO accounts (account_number, account_title, bank_name, branch_name, address, manager_name) 
+    c.execute('''INSERT INTO accounts (account_number, account_title, bank_name, branch_name, address) 
                  VALUES (?, ?, ?, ?, ?, ?)''', 
-              (account_number, account_title, bank_name, branch_name, address, manager_name))
+              (account_number, account_title, bank_name, branch_name, address))
     conn.commit()
     conn.close()
 
 # Edit an existing bank account
-def edit_account(account_id, account_number, account_title, bank_name, branch_name, address, manager_name):
+def edit_account(account_id, account_number, account_title, bank_name, branch_name, address):
     conn = sqlite3.connect('bank_accounts.db')
     c = conn.cursor()
     c.execute('''UPDATE accounts 
-                 SET account_number = ?, account_title = ?, bank_name = ?, branch_name = ?, address = ?, manager_name = ?
+                 SET account_number = ?, account_title = ?, bank_name = ?, branch_name = ?, address = ?, 
                  WHERE id = ?''', 
-              (account_number, account_title, bank_name, branch_name, address, manager_name, account_id))
+              (account_number, account_title, bank_name, branch_name, address, account_id))
     conn.commit()
     conn.close()
 
@@ -48,7 +48,7 @@ def get_accounts():
     try:
         conn = sqlite3.connect('bank_accounts.db')
         c = conn.cursor()
-        c.execute("SELECT id, account_title, account_number, bank_name, branch_name, address, manager_name FROM accounts")
+        c.execute("SELECT id, account_title, account_number, bank_name, branch_name, address, FROM accounts")
         accounts = c.fetchall()
         conn.close()
         return accounts
@@ -60,7 +60,7 @@ def get_accounts():
 def generate_letter(account_id, selected_date, request_type, from_date=None, to_date=None, signature_name=""):
     conn = sqlite3.connect('bank_accounts.db')
     c = conn.cursor()
-    c.execute("SELECT account_title, account_number, bank_name, branch_name, address, manager_name FROM accounts WHERE id = ?", (account_id,))
+    c.execute("SELECT account_title, account_number, bank_name, branch_name, address, FROM accounts WHERE id = ?", (account_id,))
     account = c.fetchone()
     conn.close()
     
@@ -81,7 +81,7 @@ def generate_letter(account_id, selected_date, request_type, from_date=None, to_
     
     # Manager and bank details
     y = 25 * cm
-    c.drawString(2 * cm, y, f"{manager_name}, Manager")
+    c.drawString(2 * cm, y, "The Manager")
     y -= 0.5 * cm
     c.drawString(2 * cm, y, bank_name)
     y -= 0.5 * cm
@@ -97,11 +97,11 @@ def generate_letter(account_id, selected_date, request_type, from_date=None, to_
     # Greeting
     y -= 1 * cm
     c.setFont("Times-Roman", 12)
-    c.drawString(2 * cm, y, f"Dear {manager_name},")
+    c.drawString(2 * cm, y, "Dear Sir")
     
     # Body
     y -= 1 * cm
-    c.drawString(2 * cm, y, f"I, {account_title}, hold an account with your esteemed bank, details of which are as follows:")
+    c.drawString(2 * cm, y, f"I, {account_title}, hold an account in your branch, account details are as follows:")
     
     # Account details (left-aligned, bold)
     y -= 1 * cm
@@ -134,9 +134,7 @@ def generate_letter(account_id, selected_date, request_type, from_date=None, to_
         y -= 0.5 * cm
         c.drawString(2 * cm, y, "issue a new cheque book for the above-mentioned account.")
         y -= 0.5 * cm
-    
-    c.drawString(2 * cm, y, "Please let me know if any further details are required.")
-    
+          
     # Closing
     y -= 1 * cm
     c.drawString(2 * cm, y, "Thank you for your assistance.")
@@ -172,12 +170,11 @@ def main():
             bank_name = st.text_input("Bank Name", placeholder="e.g., ABC Bank")
             branch_name = st.text_input("Branch Name", placeholder="e.g., Main Branch")
             address = st.text_input("Address", placeholder="e.g., 123 Bank Street, City")
-            manager_name = st.text_input("Manager Name", placeholder="e.g., Jane Doe")
             submit_button = st.form_submit_button("Add Account")
             
             if submit_button:
-                if all([account_number, account_title, bank_name, branch_name, address, manager_name]):
-                    add_account(account_number, account_title, bank_name, branch_name, address, manager_name)
+                if all([account_number, account_title, bank_name, branch_name, address,]):
+                    add_account(account_number, account_title, bank_name, branch_name, address, )
                     st.success("Bank account added successfully!")
                 else:
                     st.error("All fields are required!")
@@ -202,12 +199,11 @@ def main():
                 edit_bank_name = st.text_input("Bank Name", value=account[2], placeholder="e.g., ABC Bank")
                 edit_branch_name = st.text_input("Branch Name", value=account[3], placeholder="e.g., Main Branch")
                 edit_address = st.text_input("Address", value=account[4], placeholder="e.g., 123 Bank Street, City")
-                edit_manager_name = st.text_input("Manager Name", value=account[5], placeholder="e.g., Jane Doe")
                 edit_button = st.form_submit_button("Edit Account")
                 
                 if edit_button:
-                    if all([edit_account_number, edit_account_title, edit_bank_name, edit_branch_name, edit_address, edit_manager_name]):
-                        edit_account(selected_account_id[1], edit_account_number, edit_account_title, edit_bank_name, edit_branch_name, edit_address, edit_manager_name)
+                    if all([edit_account_number, edit_account_title, edit_bank_name, edit_branch_name, edit_address]):
+                        edit_account(selected_account_id[1], edit_account_number, edit_account_title, edit_bank_name, edit_branch_name, edit_address)
                         st.success("Bank account updated successfully!")
                     else:
                         st.error("All fields are required!")
