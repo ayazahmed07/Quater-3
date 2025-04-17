@@ -17,8 +17,7 @@ def init_db():
                   account_title TEXT, 
                   bank_name TEXT, 
                   branch_name TEXT, 
-                  address TEXT,''')
-                  
+                  address TEXT)''')
     conn.commit()
     conn.close()
 
@@ -27,7 +26,7 @@ def add_account(account_number, account_title, bank_name, branch_name, address):
     conn = sqlite3.connect('bank_accounts.db')
     c = conn.cursor()
     c.execute('''INSERT INTO accounts (account_number, account_title, bank_name, branch_name, address) 
-                 VALUES (?, ?, ?, ?, ?, ?)''', 
+                 VALUES (?, ?, ?, ?, ?)''', 
               (account_number, account_title, bank_name, branch_name, address))
     conn.commit()
     conn.close()
@@ -37,7 +36,7 @@ def edit_account(account_id, account_number, account_title, bank_name, branch_na
     conn = sqlite3.connect('bank_accounts.db')
     c = conn.cursor()
     c.execute('''UPDATE accounts 
-                 SET account_number = ?, account_title = ?, bank_name = ?, branch_name = ?, address = ?, 
+                 SET account_number = ?, account_title = ?, bank_name = ?, branch_name = ?, address = ?
                  WHERE id = ?''', 
               (account_number, account_title, bank_name, branch_name, address, account_id))
     conn.commit()
@@ -48,7 +47,7 @@ def get_accounts():
     try:
         conn = sqlite3.connect('bank_accounts.db')
         c = conn.cursor()
-        c.execute("SELECT id, account_title, account_number, bank_name, branch_name, address, FROM accounts")
+        c.execute("SELECT id, account_title, account_number, bank_name, branch_name, address FROM accounts")
         accounts = c.fetchall()
         conn.close()
         return accounts
@@ -60,7 +59,7 @@ def get_accounts():
 def generate_letter(account_id, selected_date, request_type, from_date=None, to_date=None, signature_name=""):
     conn = sqlite3.connect('bank_accounts.db')
     c = conn.cursor()
-    c.execute("SELECT account_title, account_number, bank_name, branch_name, address, FROM accounts WHERE id = ?", (account_id,))
+    c.execute("SELECT account_title, account_number, bank_name, branch_name, address FROM accounts WHERE id = ?", (account_id,))
     account = c.fetchone()
     conn.close()
     
@@ -68,7 +67,7 @@ def generate_letter(account_id, selected_date, request_type, from_date=None, to_
         st.error("Account not found")
         return None
     
-    account_title, account_number, bank_name, branch_name, address, manager_name = account
+    account_title, account_number, bank_name, branch_name, address = account
     formatted_date = datetime.strptime(selected_date, '%Y-%m-%d').strftime('%d %B %Y')
     
     # Create PDF
@@ -134,7 +133,9 @@ def generate_letter(account_id, selected_date, request_type, from_date=None, to_
         y -= 0.5 * cm
         c.drawString(2 * cm, y, "issue a new cheque book for the above-mentioned account.")
         y -= 0.5 * cm
-          
+    
+    c.drawString(2 * cm, y, "Please let me know if any further details are required.")
+    
     # Closing
     y -= 1 * cm
     c.drawString(2 * cm, y, "Thank you for your assistance.")
@@ -159,7 +160,7 @@ def main():
     init_db()
     
     # Tabs for Add, Edit, and Print
-    tab1, tab2, tab3 = st.tabs(["Add Account", "Edit Account", "Print Letter"])
+    tab1, tab2, tab3 = st.tabs(["Add Account", "Print Letter", "Edit Account"])
     
     # Add Account Tab
     with tab1:
@@ -173,43 +174,14 @@ def main():
             submit_button = st.form_submit_button("Add Account")
             
             if submit_button:
-                if all([account_number, account_title, bank_name, branch_name, address,]):
-                    add_account(account_number, account_title, bank_name, branch_name, address, )
+                if all([account_number, account_title, bank_name, branch_name, address]):
+                    add_account(account_number, account_title, bank_name, branch_name, address)
                     st.success("Bank account added successfully!")
                 else:
                     st.error("All fields are required!")
     
-    # Edit Account Tab
-    with tab2:
-        st.header("Edit Selected Account")
-        accounts = get_accounts()
-        account_options = [(f"{acc[1]} - {acc[2]} ({acc[3]})", acc[0]) for acc in accounts] if accounts else [("No accounts available", 0)]
-        selected_account_id = st.selectbox("Select Account", options=account_options, format_func=lambda x: x[0], key="edit_select")
-        
-        if selected_account_id[1] != 0:
-            conn = sqlite3.connect('bank_accounts.db')
-            c = conn.cursor()
-            c.execute("SELECT account_number, account_title, bank_name, branch_name, address, manager_name FROM accounts WHERE id = ?", (selected_account_id[1],))
-            account = c.fetchone()
-            conn.close()
-            
-            with st.form("edit_account_form"):
-                edit_account_number = st.text_input("Account Number", value=account[0], placeholder="e.g., 1234567890")
-                edit_account_title = st.text_input("Account Title", value=account[1], placeholder="e.g., John Doe")
-                edit_bank_name = st.text_input("Bank Name", value=account[2], placeholder="e.g., ABC Bank")
-                edit_branch_name = st.text_input("Branch Name", value=account[3], placeholder="e.g., Main Branch")
-                edit_address = st.text_input("Address", value=account[4], placeholder="e.g., 123 Bank Street, City")
-                edit_button = st.form_submit_button("Edit Account")
-                
-                if edit_button:
-                    if all([edit_account_number, edit_account_title, edit_bank_name, edit_branch_name, edit_address]):
-                        edit_account(selected_account_id[1], edit_account_number, edit_account_title, edit_bank_name, edit_branch_name, edit_address)
-                        st.success("Bank account updated successfully!")
-                    else:
-                        st.error("All fields are required!")
-    
     # Print Letter Tab
-    with tab3:
+    with tab2:
         st.header("Select Bank Account and Print Letter")
         accounts = get_accounts()
         account_options = [(f"{acc[1]} - {acc[2]} ({acc[3]})", acc[0]) for acc in accounts] if accounts else [("No accounts available", 0)]
@@ -250,5 +222,38 @@ def main():
                         st.download_button("Download PDF", f, file_name="bank_letter.pdf")
                     st.success("PDF generated successfully!")
 
+
+
+    # Edit Account Tab
+    with tab3:
+        st.header("Edit Selected Account")
+        accounts = get_accounts()
+        account_options = [(f"{acc[1]} - {acc[2]} ({acc[3]})", acc[0]) for acc in accounts] if accounts else [("No accounts available", 0)]
+        selected_account_id = st.selectbox("Select Account", options=account_options, format_func=lambda x: x[0], key="edit_select")
+        
+        if selected_account_id[1] != 0:
+            conn = sqlite3.connect('bank_accounts.db')
+            c = conn.cursor()
+            c.execute("SELECT account_number, account_title, bank_name, branch_name, address FROM accounts WHERE id = ?", (selected_account_id[1],))
+            account = c.fetchone()
+            conn.close()
+            
+            with st.form("edit_account_form"):
+                edit_account_number = st.text_input("Account Number", value=account[0], placeholder="e.g., 1234567890")
+                edit_account_title = st.text_input("Account Title", value=account[1], placeholder="e.g., John Doe")
+                edit_bank_name = st.text_input("Bank Name", value=account[2], placeholder="e.g., ABC Bank")
+                edit_branch_name = st.text_input("Branch Name", value=account[3], placeholder="e.g., Main Branch")
+                edit_address = st.text_input("Address", value=account[4], placeholder="e.g., 123 Bank Street, City")
+                edit_button = st.form_submit_button("Edit Account")
+                
+                if edit_button:
+                    if all([edit_account_number, edit_account_title, edit_bank_name, edit_branch_name, edit_address]):
+                        edit_account(selected_account_id[1], edit_account_number, edit_account_title, edit_bank_name, edit_branch_name, edit_address)
+                        st.success("Bank account updated successfully!")
+                    else:
+                        st.error("All fields are required!")
+    
+    
+
 if __name__ == "__main__":
-    main() 
+    main()
