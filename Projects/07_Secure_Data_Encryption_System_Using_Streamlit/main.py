@@ -5,6 +5,12 @@ import hashlib
 
 key = Fernet.generate_key()
 
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+if "logged_user" not in st.session_state:
+    st.session_state.logged_user = ""
+
 if "stored_data" not in st.session_state:
     st.session_state.stored_data = {}
 
@@ -66,18 +72,16 @@ elif menu == "Decrypt Data":
 
 
 elif menu == "Login":
-    st.header("🔐 Reauthorization Required")
+    st.header("🔐 Authorization Required")
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
     
     # For now: simple fixed login
     if st.button("Login"):
-        if username == "admin" and password == "admin123":
-            for user in stored_data:
-                stored_data[user]["attempts"] = 0  # Reset all attempts
-            st.success("🔓 Login successful!")
+        if username in stored_data and hashlib.sha256(password.encode()).hexdigest() == stored_data[username]["hashed_passkey"]:
+            stored_data[username]["attempts"] = 0  # Reset attempts
+            st.session_state.is_logged_in = True
+            st.session_state.logged_user = username
+            st.success("🔓 Login successful! Go to 'Decrypt Data'")
         else:
             st.error("❌ Invalid login.")
-
-
-
