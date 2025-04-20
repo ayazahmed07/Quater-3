@@ -54,7 +54,7 @@ elif menu == "Decrypt Data":
     if st.button("Decrypt Data"):
         if user_name in stored_data:
             if stored_data[user_name]["attempts"] >= 3:
-                st.warning(f"Too many failed attempts. Access denied for user {user_name}.. login again!!")
+                st.sidebar.warning(f"Too many failed attempts. Access denied for user {user_name}.. login again!!")
             else:
                 hashed = hashlib.sha256(passkey.encode()).hexdigest()
                 if hashed == stored_data[user_name]["hashed_passkey"]:
@@ -64,7 +64,7 @@ elif menu == "Decrypt Data":
                 else:
                     stored_data[user_name]["attempts"] +=1
                     st.error("Wrong passkey!!")
-                    st.info(f"Attempts: {stored_data[user_name]['attempts']} / 3 ")
+                    st.sidebar.info(f"Attempts: {stored_data[user_name]['attempts']} / 3 ")
                     
 
         else:
