@@ -1,7 +1,7 @@
 import streamlit as st
 from cryptography.fernet import Fernet
 import hashlib
-
+import json
 
 key = Fernet.generate_key()
 
@@ -20,6 +20,16 @@ if "cipher" not in st.session_state:
 
 cipher = st.session_state.cipher
 stored_data = st.session_state.stored_data
+
+with open("data.json", "w") as datafile:
+    json.dump(stored_data, datafile)
+
+try:
+    with open("data.json", "r") as f:
+        stored_data = json.load(f)
+except:
+    stored_data = {}
+
 
 st.title("Secure Data Encryption System")
 
@@ -54,7 +64,7 @@ elif menu == "Decrypt Data":
     if st.button("Decrypt Data"):
         if user_name in stored_data:
             if stored_data[user_name]["attempts"] >= 3:
-                st.sidebar.warning(f"Too many failed attempts. Access denied for user {user_name}.. login again!!")
+                st.sidebar.error(f"Too many failed attempts. Access denied for user {user_name}.. login again!!")
             else:
                 hashed = hashlib.sha256(passkey.encode()).hexdigest()
                 if hashed == stored_data[user_name]["hashed_passkey"]:
