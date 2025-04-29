@@ -1,5 +1,9 @@
 {
     "ayaz": {
         "password": "Brain@1a1"
+    },
+    "admin": {
+        "salt": "JdzIJa1iM9PqoDPtIhoy8Q==",
+        "hashed_password": "vXPtjWOMzqgUrm99rAWw7Xns6phgyUYy8hNzQfhHHlE="
     }
 }

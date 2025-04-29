@@ -1,0 +1,21 @@
+{
+    "admin": [
+        {
+            "action": "Register",
+            "timestamp": "2025-04-29 10:16:30",
+            "details": "Account created"
+        },
+        {
+            "action": "Login",
+            "timestamp": "2025-04-29 10:18:28",
+            "details": "Success"
+        }
+    ],
+    "admin123": [
+        {
+            "action": "Failed Login",
+            "timestamp": "2025-04-29 10:18:19",
+            "details": "Invalid credentials"
+        }
+    ]
+}
