@@ -254,7 +254,7 @@ def main():
     else:
         st.success(f"Welcome, {st.session_state.current_user}!")
         menu = ["Home", "Store Data", "Retrieve Data", "Delete Data", "View History", "Logout"]
-        choice = st.sidebar.selectbox("Select an option", menu)
+        choice = st.sidebar.radio("Select an option", menu)
 
         if choice == "Home":
             st.write("You are logged in. Use the sidebar to manage your data.")

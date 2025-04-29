@@ -2,20 +2,48 @@
     "admin": [
         {
             "action": "Register",
-            "timestamp": "2025-04-29 10:16:30",
+            "timestamp": "2025-04-29 11:37:44",
             "details": "Account created"
         },
         {
-            "action": "Login",
-            "timestamp": "2025-04-29 10:18:28",
-            "details": "Success"
-        }
-    ],
-    "admin123": [
-        {
             "action": "Failed Login",
-            "timestamp": "2025-04-29 10:18:19",
+            "timestamp": "2025-04-29 11:37:49",
             "details": "Invalid credentials"
+        },
+        {
+            "action": "Login",
+            "timestamp": "2025-04-29 11:38:35",
+            "details": "Success"
+        },
+        {
+            "action": "Logout",
+            "timestamp": "2025-04-29 11:39:20",
+            "details": "Logged out"
+        },
+        {
+            "action": "Login",
+            "timestamp": "2025-04-29 11:39:28",
+            "details": "Success"
+        },
+        {
+            "action": "Store Data",
+            "timestamp": "2025-04-29 11:39:45",
+            "details": "Stored 'Data Encrypt' (ID: 1)"
+        },
+        {
+            "action": "Retrieve Data",
+            "timestamp": "2025-04-29 11:39:53",
+            "details": "Retrieved 'Data Encrypt' (ID: 1)"
+        },
+        {
+            "action": "Delete Data",
+            "timestamp": "2025-04-29 11:40:00",
+            "details": "Deleted 'Data Encrypt' (ID: 1)"
+        },
+        {
+            "action": "Logout",
+            "timestamp": "2025-04-29 11:40:06",
+            "details": "Logged out"
         }
     ]
 }
