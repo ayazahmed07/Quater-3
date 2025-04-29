@@ -1,35 +1,29 @@
 import streamlit as st
 import json
-import os
 import base64
 import hashlib
 from cryptography.fernet import Fernet
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.backends import default_backend
-from datetime import datetime
 import re
+from datetime import datetime
+import time
 
 # File load/save functions
 def load_users():
     try:
-        with open("users.json", "r") as file:
-            return json.load(file)
+        with open("users.json", "r") as f:
+            return json.load(f)
     except FileNotFoundError:
         return {}
 
 def save_users(users):
-    with open("users.json", "w") as file:
-        json.dump(users, file, indent=4)
+    with open("users.json", "w") as f:
+        json.dump(users, f, indent=4)
 
 def load_stored_data():
     try:
         with open("data.json", "r") as f:
             return json.load(f)
     except FileNotFoundError:
-        return {}
-    except json.JSONDecodeError:
-        st.warning("data.json is corrupted. Starting with empty data.")
         return {}
 
 def save_stored_data(data):
@@ -42,9 +36,6 @@ def load_logs():
             return json.load(f)
     except FileNotFoundError:
         return {}
-    except json.JSONDecodeError:
-        st.warning("logs.json is corrupted. Starting with empty logs.")
-        return {}
 
 def save_logs(logs):
     with open("logs.json", "w") as f:
@@ -53,72 +44,58 @@ def save_logs(logs):
 # Password validation
 def password_check(password):
     if not (8 <= len(password) <= 12):
-        return False, "Password must be between 8 and 12 characters."
+        return False, "Password: Must be at least 8-12 chars!"
     if not re.search(r'[a-z]', password):
-        return False, "Password must contain at least one lowercase letter."
+        return False, "Need 1 lowercase!"
     if not re.search(r'[0-9]', password):
-        return False, "Password must contain at least one digit."
+        return False, "Need 1 digit!"
     if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
-        return False, "Password must contain at least one special character."
-    return True, "Password is valid."
+        return False, "Need 1 special char!"
+    return True, ""
+
+# Lockout function
+def is_locked_out():
+    if "lockout_time" in st.session_state and st.session_state.lockout_time:
+        elapsed = time.time() - st.session_state.lockout_time
+        if elapsed < 30:
+            st.warning(f"Locked out. Wait for {30 - int(elapsed)} seconds.")
+            return True
+        st.session_state.lockout_time = 0
+        st.session_state.pin_attempts = 0
+    return False
 
 # Authentication functions
-def hash_password(password, salt):
-    kdf = PBKDF2HMAC(
-        algorithm=hashes.SHA256(),
-        length=32,
-        salt=salt,
-        iterations=100000,
-        backend=default_backend()
-    )
-    key = kdf.derive(password.encode())
-    return base64.urlsafe_b64encode(key).decode('utf-8')
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def get_fernet_key(pin):
+    if not pin:
+        return None
+    hashed_pin = hashlib.sha256(pin.encode()).hexdigest()
+    key = hashed_pin[:32].encode()
+    return Fernet(base64.urlsafe_b64encode(key))
 
 def register(username, password, confirm_password):
     valid, msg = password_check(password)
     if not valid:
         return False, msg
     if password != confirm_password:
-        return False, "Passwords do not match."
-    
-    salt = os.urandom(16)
-    hashed_password = hash_password(password, salt)
+        return False, "Passwords don't match!"
     users = load_users()
     if username in users:
-        return False, "Username already exists."
-    
-    users[username] = {"salt": base64.b64encode(salt).decode('utf-8'), "hashed_password": hashed_password}
+        return False, "Username exists!"
+    users[username] = {"hashed_password": hash_password(password)}
     save_users(users)
-    log_action(username, "Register", "Account created")
-    return True, "Registration successful! You can now login."
+    log_action(username, "Register", "Account created Successfuly")
+    return True, "Registered! Please login Now."
 
 def login(username, password):
     users = load_users()
-    if username in users:
-        stored_salt = base64.b64decode(users[username]["salt"])
-        stored_hashed_password = users[username]["hashed_password"]
-        provided_hashed_password = hash_password(password, stored_salt)
-        if provided_hashed_password == stored_hashed_password:
-            st.session_state.fernet = Fernet(stored_hashed_password)
-            log_action(username, "Login", "Success")
-            return True
+    if username in users and users[username]["hashed_password"] == hash_password(password):
+        log_action(username, "Login", "Successfully Login")
+        return True
     log_action(username or "unknown", "Failed Login", "Invalid credentials")
     return False
-
-def reset_password(username, new_password):
-    valid, msg = password_check(new_password)
-    if not valid:
-        return False, msg
-    users = load_users()
-    if username not in users:
-        return False, "Username not found."
-    
-    salt = os.urandom(16)
-    hashed_password = hash_password(new_password, salt)
-    users[username] = {"salt": base64.b64encode(salt).decode('utf-8'), "hashed_password": hashed_password}
-    save_users(users)
-    log_action(username, "Reset Password", "Password reset")
-    return True, "Password reset successful!"
 
 # Logging function
 def log_action(user, action, details=""):
@@ -130,69 +107,136 @@ def log_action(user, action, details=""):
 # Data functions
 def store_data_page():
     st.title("Store Data")
+    if "pin_attempts" not in st.session_state:
+        st.session_state.pin_attempts = 0
     name = st.text_input("Data Name")
     data = st.text_area("Data")
-    if st.button("Store"):
-        if name and data:
+    pin = st.text_input("PIN for Encryption", type="password")
+    if st.button("Encrypt Data"):
+        if name and data and pin:
             user = st.session_state.current_user
             if user not in st.session_state.stored_data:
-                st.session_state.stored_data[user] = {}
-            max_id = max([int(id) for id in st.session_state.stored_data[user].keys()] + [0])
-            new_id = str(max_id + 1)
-            fernet = st.session_state.fernet
-            encrypted_data = fernet.encrypt(data.encode('utf-8')).decode('utf-8')
-            st.session_state.stored_data[user][new_id] = {"name": name, "encrypted_data": encrypted_data}
-            save_stored_data(st.session_state.stored_data)
-            log_action(user, "Store Data", f"Stored '{name}' (ID: {new_id})")
-            st.success(f"Data stored with ID {new_id}")
+                st.session_state.stored_data[user] = []
+            fernet = get_fernet_key(pin)
+            if not fernet:
+                st.error("Invalid PIN!")
+                return
+            try:
+                encrypted_data = fernet.encrypt(data.encode()).decode()
+                st.session_state.stored_data[user].append({"name": name, "encrypted_data": encrypted_data})
+                save_stored_data(st.session_state.stored_data)
+                log_action(user, "Store Data", f"Stored '{name}'")
+                st.success("Data stored!")
+                st.session_state.pin_attempts = 0
+            except:
+                st.session_state.pin_attempts += 1
+                log_action(user, "Failed Store", f"Wrong PIN attempt {st.session_state.pin_attempts}")
+                st.error(f"Encryption failed! Attempts left: {3 - st.session_state.pin_attempts}")
+                if st.session_state.pin_attempts >= 3:
+                    log_action(user, "Lockout", "Logged out due to 3 wrong PINs")
+                    st.session_state.authenticated = False
+                    st.session_state.current_user = None
+                    st.session_state.lockout_time = time.time()
+                    st.error("Logged out due to 3 wrong PINs!")
+                    st.rerun()
         else:
-            st.error("Please enter name and data.")
+            st.error("Fill all fields!")
 
 def retrieve_data_page():
     st.title("Retrieve Data")
+    if "pin_attempts" not in st.session_state:
+        st.session_state.pin_attempts = 0
     user = st.session_state.current_user
     if user not in st.session_state.stored_data or not st.session_state.stored_data[user]:
-        st.info("No data stored yet.")
+        st.info("No data stored.")
         return
-    entries = [(id, entry["name"]) for id, entry in st.session_state.stored_data[user].items()]
-    options = [f"{name} (ID: {id})" for id, name in entries]
-    selected = st.selectbox("Select data", options)
-    id = next(i for i, n in entries if f"{n} (ID: {i})" == selected)
-    if st.button("Retrieve"):
-        stored = st.session_state.stored_data[user][id]
-        fernet = st.session_state.fernet
-        try:
-            decrypted_data = fernet.decrypt(stored["encrypted_data"].encode('utf-8')).decode('utf-8')
-            st.success("Data retrieved!")
-            st.write("Data:", decrypted_data)
-            log_action(user, "Retrieve Data", f"Retrieved '{stored['name']}' (ID: {id})")
-        except:
-            st.error("Decryption failed. Data may be corrupted.")
+    names = [entry["name"] for entry in st.session_state.stored_data[user]]
+    selected = st.selectbox("Select data", names)
+    pin = st.text_input("PIN for Decryption", type="password")
+    if st.button("Decrypt"):
+        if not pin:
+            st.error("Enter PIN!")
+            return
+        fernet = get_fernet_key(pin)
+        if not fernet:
+            st.error("Invalid PIN!")
+            return
+        for entry in st.session_state.stored_data[user]:
+            if entry["name"] == selected:
+                try:
+                    decrypted_data = fernet.decrypt(entry["encrypted_data"].encode()).decode()
+                    st.success("Data retrieved!")
+                    st.write("Data:", decrypted_data)
+                    log_action(user, "Retrieve Data", f"Retrieved '{selected}'")
+                    st.session_state.pin_attempts = 0
+                    break
+                except:
+                    st.session_state.pin_attempts += 1
+                    log_action(user, "Failed Retrieve", f"Wrong PIN attempt {st.session_state.pin_attempts}")
+                    st.error(f"Decryption failed! Attempts left: {3 - st.session_state.pin_attempts}")
+                    if st.session_state.pin_attempts >= 3:
+                        log_action(user, "Lockout", "Logged out due to 3 wrong PINs")
+                        st.session_state.authenticated = False
+                        st.session_state.current_user = None
+                        st.session_state.lockout_time = time.time()
+                        st.sidebar.error("Logged out due to 3 wrong PINs!")
+                        st.rerun()
+                    break
+        else:
+            st.error("Data not found!")
 
 def delete_data_page():
     st.title("Delete Data")
+    if "pin_attempts" not in st.session_state:
+        st.session_state.pin_attempts = 0
     user = st.session_state.current_user
     if user not in st.session_state.stored_data or not st.session_state.stored_data[user]:
-        st.info("No data stored yet.")
+        st.info("No data stored.")
         return
-    entries = [(id, entry["name"]) for id, entry in st.session_state.stored_data[user].items()]
-    options = [f"{name} (ID: {id})" for id, name in entries]
-    selected = st.selectbox("Select data to delete", options)
-    id = next(i for i, n in entries if f"{n} (ID: {i})" == selected)
+    names = [entry["name"] for entry in st.session_state.stored_data[user]]
+    selected = st.selectbox("Select data to delete", names)
+    pin = st.text_input("PIN for Verification", type="password")
     if st.button("Delete"):
-        del st.session_state.stored_data[user][id]
-        if not st.session_state.stored_data[user]:
-            del st.session_state.stored_data[user]
-        save_stored_data(st.session_state.stored_data)
-        log_action(user, "Delete Data", f"Deleted '{selected.split(' (ID: ')[0]}' (ID: {id})")
-        st.success("Data deleted!")
+        if not pin:
+            st.error("Enter PIN!")
+            return
+        fernet = get_fernet_key(pin)
+        if not fernet:
+            st.error("Invalid PIN!")
+            return
+        for i, entry in enumerate(st.session_state.stored_data[user]):
+            if entry["name"] == selected:
+                try:
+                    fernet.decrypt(entry["encrypted_data"].encode())
+                    st.session_state.stored_data[user].pop(i)
+                    if not st.session_state.stored_data[user]:
+                        del st.session_state.stored_data[user]
+                    save_stored_data(st.session_state.stored_data)
+                    log_action(user, "Delete Data", f"Deleted '{selected}'")
+                    st.success("Data deleted!")
+                    st.session_state.pin_attempts = 0
+                    break
+                except:
+                    st.session_state.pin_attempts += 1
+                    log_action(user, "Failed Delete", f"Wrong PIN attempt {st.session_state.pin_attempts}")
+                    st.error(f"Wrong PIN! Attempts left: {3 - st.session_state.pin_attempts}")
+                    if st.session_state.pin_attempts >= 3:
+                        log_action(user, "Lockout", "Logged out due to 3 wrong PINs")
+                        st.session_state.authenticated = False
+                        st.session_state.current_user = None
+                        st.session_state.lockout_time = time.time()
+                        st.error("Logged out due to 3 wrong PINs!")
+                        st.rerun()
+                    break
+        else:
+            st.error("Data not found!")
 
 def view_history_page():
     st.title("View History")
     user = st.session_state.current_user
     logs = load_logs().get(user, [])
     if not logs:
-        st.info("No activity logged yet.")
+        st.info("No activity logged.")
         return
     st.subheader("Activity Log")
     for log in logs:
@@ -208,11 +252,11 @@ def main():
         st.session_state.authenticated = False
     if "current_user" not in st.session_state:
         st.session_state.current_user = None
-    if "fernet" not in st.session_state:
-        st.session_state.fernet = None
 
     if not st.session_state.authenticated:
-        tabs = st.tabs(["Login", "Register", "Forgot Password"])
+        if is_locked_out():
+            return
+        tabs = st.tabs(["Login", "Register"])
 
         with tabs[0]:  # Login tab
             st.subheader("Login")
@@ -220,44 +264,34 @@ def main():
             password = st.text_input("Password", type="password", key="login_password")
             if st.button("Login"):
                 if login(username, password):
-                    st.success("Logged in successfully!")
+                    st.success("Logged in!")
                     st.session_state.authenticated = True
                     st.session_state.current_user = username
+                    st.session_state.pin_attempts = 0
                     st.rerun()
                 else:
                     st.error("Invalid username or password.")
 
         with tabs[1]:  # Register tab
             st.subheader("Register")
-            new_username = st.text_input("New Username", key="register_username")
-            new_password = st.text_input("New Password", type="password", key="register_password")
+            username = st.text_input("Username", key="register_username")
+            password = st.text_input("Password", type="password", key="register_password")
             confirm_password = st.text_input("Confirm Password", type="password", key="confirm_password")
             if st.button("Register"):
-                success, message = register(new_username, new_password, confirm_password)
+                success, message = register(username, password, confirm_password)
                 if success:
                     st.success(message)
                 else:
                     st.error(message)
-
-        with tabs[2]:  # Forgot Password tab
-            st.subheader("Forgot Password")
-            reset_username = st.text_input("Username", key="forgot_username")
-            new_password = st.text_input("New Password", type="password", key="forgot_new_password")
-            st.warning("Note: Resetting your password will make your existing data inaccessible.")
-            if st.button("Reset Password"):
-                success, message = reset_password(reset_username, new_password)
-                if success:
-                    st.success(message)
-                else:
-                    st.error(message)
-
+        
     else:
         st.success(f"Welcome, {st.session_state.current_user}!")
         menu = ["Home", "Store Data", "Retrieve Data", "Delete Data", "View History", "Logout"]
-        choice = st.sidebar.radio("Select an option", menu)
+        choice = st.sidebar.radio("Select option", menu)
 
         if choice == "Home":
-            st.write("You are logged in. Use the sidebar to manage your data.")
+            st.title("🔒 Secure Data Encryption System")
+            st.write("Use the sidebar to manage your data.")
 
         elif choice == "Store Data":
             store_data_page()
@@ -275,8 +309,8 @@ def main():
             log_action(st.session_state.current_user, "Logout", "Logged out")
             st.session_state.authenticated = False
             st.session_state.current_user = None
-            st.session_state.fernet = None
-            st.success("Logged out successfully!")
+            st.session_state.pin_attempts = 0
+            st.success("Logged out!")
             st.rerun()
 
 if __name__ == "__main__":
