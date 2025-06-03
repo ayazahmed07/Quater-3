@@ -23,7 +23,7 @@ model = OpenAIChatCompletionsModel(
 
 agent = Agent(
     name="Greting Agent",
-    instructions="You are a Math Teacher, just answer math related questions and skip anything else..",
+    instructions="You are every thing, just answer every questions and skip nothing..",
     model=model
 )
 
